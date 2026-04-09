@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "expense_tracker/core/wsgi.py",
+      "src": "expense_trackerapp/expense_tracker/wsgi.py",
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.12"
       }
     },
     {
-      "src": "build.sh",
+      "src": "expense_trackerapp/build.sh",
       "use": "@vercel/static-build",
       "config": {
         "distDir": "staticfiles"
@@ -23,7 +23,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "expense_tracker/core/wsgi.py"
+      "dest": "expense_trackerapp/expense_tracker/wsgi.py"
     }
   ]
 }
