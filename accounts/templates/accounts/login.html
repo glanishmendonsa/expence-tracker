@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — Flo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14; --surface: #14161d; --surface2: #1c1f2a;
+      --border: #252836; --accent: #7c6af7; --accent2: #f7c46a;
+      --text: #e8eaf0; --muted: #6b7280;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .auth-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-width: 900px;
+      width: 100%;
+      margin: 20px;
+      min-height: 540px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .auth-hero {
+      background: linear-gradient(135deg, #1a1040 0%, #0d0f14 100%);
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-hero::before {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(124,106,247,0.2) 0%, transparent 70%);
+      top: -50px; left: -50px;
+    }
+    .hero-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 2.4rem;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .hero-logo span { color: var(--accent2); }
+    .hero-tagline {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+    .hero-sub { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+    .hero-badges { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
+    .hero-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .hero-badge-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+    .auth-form-section {
+      background: var(--surface);
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .form-heading {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+    }
+    .form-sub { color: var(--muted); font-size: 0.88rem; margin-bottom: 32px; }
+    .form-group { margin-bottom: 18px; }
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 7px;
+    }
+    .form-input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent); }
+    .btn-submit {
+      width: 100%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 13px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+    .btn-submit:hover { background: #6b5ce7; transform: translateY(-1px); }
+    .auth-link { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--muted); }
+    .auth-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .errorlist { color: #f87171; font-size: 0.8rem; list-style: none; margin-top: 4px; }
+    .alert { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 16px; background: rgba(248,113,113,0.1); color: #f87171; border-left: 3px solid #f87171; }
+    @media (max-width: 640px) {
+      .auth-wrap { grid-template-columns: 1fr; }
+      .auth-hero { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-hero">
+    <div class="hero-logo">Flo<span>.</span></div>
+    <div class="hero-tagline">Track every rupee. Own your finances.</div>
+    <div class="hero-sub">Log income & expenses, visualize spending patterns, and stay in control of your money.</div>
+    <div class="hero-badges">
+      <div class="hero-badge"><div class="hero-badge-dot"></div>Multi-currency support</div>
+      <div class="hero-badge"><div class="hero-badge-dot" style="background:#4ade80"></div>Beautiful charts & graphs</div>
+      <div class="hero-badge"><div class="hero-badge-dot" style="background:#f7c46a"></div>Monthly spending reports</div>
+    </div>
+  </div>
+  <div class="auth-form-section">
+    <div class="form-heading">Welcome back</div>
+    <div class="form-sub">Sign in to your account</div>
+    {% if messages %}
+      {% for message in messages %}<div class="alert">{{ message }}</div>{% endfor %}
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="form-group">
+          <label class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn-submit">Sign In →</button>
+    </form>
+    <div class="auth-link">Don't have an account? <a href="{% url 'register' %}">Create one</a></div>
+  </div>
+</div>
+</body>
+</html>

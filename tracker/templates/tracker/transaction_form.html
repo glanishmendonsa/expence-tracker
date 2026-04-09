@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block nav_add %}{% if action == 'Add' %}active{% endif %}{% endblock %}
+{% block title %}{{ action }} Transaction — Flo{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-title">{{ action }} Transaction</div>
+  <div class="page-subtitle">{% if action == 'Add' %}Record a new income or expense{% else %}Update transaction details{% endif %}</div>
+</div>
+
+<div style="max-width:680px;">
+  <div class="card">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+
+        <!-- Title -->
+        <div class="form-group full">
+          <label class="form-label">{{ form.title.label }}</label>
+          {{ form.title }}
+          {% if form.title.errors %}<ul class="errorlist">{% for e in form.title.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group">
+          <label class="form-label">{{ form.amount.label }}</label>
+          {{ form.amount }}
+          {% if form.amount.errors %}<ul class="errorlist">{% for e in form.amount.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+        </div>
+
+        <!-- Currency -->
+        <div class="form-group">
+          <label class="form-label">{{ form.currency.label }}</label>
+          {{ form.currency }}
+        </div>
+
+        <!-- Type -->
+        <div class="form-group">
+          <label class="form-label">{{ form.type.label }}</label>
+          {{ form.type }}
+        </div>
+
+        <!-- Category -->
+        <div class="form-group">
+          <label class="form-label">{{ form.category.label }}</label>
+          {{ form.category }}
+        </div>
+
+        <!-- Date -->
+        <div class="form-group full">
+          <label class="form-label">{{ form.date.label }}</label>
+          {{ form.date }}
+        </div>
+
+        <!-- Note -->
+        <div class="form-group full">
+          <label class="form-label">{{ form.note.label }} <span style="color:var(--muted);font-weight:400;">(optional)</span></label>
+          {{ form.note }}
+        </div>
+
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:24px;">
+        <button type="submit" class="btn btn-primary">
+          {% if action == 'Add' %}
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+            Add Transaction
+          {% else %}
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            Save Changes
+          {% endif %}
+        </button>
+        <a href="{% if action == 'Edit' %}{% url 'transaction_list' %}{% else %}{% url 'dashboard' %}{% endif %}" class="btn btn-ghost">Cancel</a>
+        {% if action == 'Edit' %}
+          <a href="{% url 'delete_transaction' transaction.pk %}" class="btn btn-danger" style="margin-left:auto;">Delete</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Quick Tips -->
+  <div style="margin-top:20px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);">
+    <div style="font-size:0.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Tips</div>
+    <div style="font-size:0.84rem;color:var(--muted);line-height:1.7;">
+      • Use <strong style="color:var(--text);">Income</strong> for salary, freelance, gifts, investments<br>
+      • Use <strong style="color:var(--text);">Expense</strong> for anything you spend money on<br>
+      • Select the correct <strong style="color:var(--text);">currency</strong> — amounts are stored as-is<br>
+      • Add a <strong style="color:var(--text);">note</strong> for context (e.g. "Team lunch at Koramangala")
+    </div>
+  </div>
+</div>
+{% endblock %}

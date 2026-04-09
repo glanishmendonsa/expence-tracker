@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block nav_dashboard %}active{% endblock %}
+{% block title %}Dashboard — Flo{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+  <div>
+    <div class="page-title">Dashboard</div>
+    <div class="page-subtitle">{{ current_month_name }} overview</div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+    <form method="get" style="display:flex;gap:8px;align-items:center;">
+      <select name="month" class="filter-select" onchange="this.form.submit()">
+        {% for num, name in months %}
+          <option value="{{ num }}" {% if num == selected_month %}selected{% endif %}>{{ name }}</option>
+        {% endfor %}
+      </select>
+      <select name="year" class="filter-select" onchange="this.form.submit()">
+        {% for y in years %}
+          <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </form>
+    <a href="{% url 'add_transaction' %}" class="btn btn-primary">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+      Add Transaction
+    </a>
+  </div>
+</div>
+
+<!-- STAT CARDS -->
+<div class="stats-grid">
+  <div class="stat-card income">
+    <div class="stat-label">Total Income</div>
+    <div class="stat-value">₹{{ total_income|floatformat:2 }}</div>
+  </div>
+  <div class="stat-card expense">
+    <div class="stat-label">Total Expenses</div>
+    <div class="stat-value">₹{{ total_expense|floatformat:2 }}</div>
+  </div>
+  <div class="stat-card balance">
+    <div class="stat-label">Net Balance</div>
+    <div class="stat-value">₹{{ net_balance|floatformat:2 }}</div>
+  </div>
+</div>
+
+<!-- CHARTS -->
+<div class="charts-grid">
+  <div class="card">
+    <div class="card-title">Spending by Category</div>
+    <div class="chart-container" style="height:260px;">
+      <canvas id="pieChart"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">6-Month Overview</div>
+    <div class="chart-container" style="height:260px;">
+      <canvas id="barChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- RECENT TRANSACTIONS -->
+<div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div class="card-title" style="margin-bottom:0;">Recent Transactions</div>
+    <a href="{% url 'transaction_list' %}" class="btn btn-ghost btn-sm">View all →</a>
+  </div>
+  {% if recent_transactions %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in recent_transactions %}
+        <tr>
+          <td style="font-weight:500;">{{ t.title }}</td>
+          <td style="color:var(--muted);font-size:0.85rem;">{{ t.category }}</td>
+          <td style="color:var(--muted);font-size:0.85rem;">{{ t.date|date:"d M Y" }}</td>
+          <td><span class="badge badge-{{ t.type }}">{{ t.type|title }}</span></td>
+          <td class="amount-{{ t.type }}">{{ t.currency_symbol }}{{ t.amount }} <span style="font-size:0.75rem;opacity:0.6;">{{ t.currency }}</span></td>
+          <td>
+            <a href="{% url 'edit_transaction' t.pk %}" class="btn btn-ghost btn-sm">Edit</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    <p>No transactions yet</p>
+    <span>Add your first income or expense to get started</span><br><br>
+    <a href="{% url 'add_transaction' %}" class="btn btn-primary btn-sm">+ Add Transaction</a>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+const pieLabels = {{ pie_labels|safe }};
+const pieValues = {{ pie_values|safe }};
+const barLabels = {{ bar_labels|safe }};
+const barIncome = {{ bar_income|safe }};
+const barExpense = {{ bar_expense|safe }};
+
+const COLORS = ['#7c6af7','#f7c46a','#4ade80','#f87171','#38bdf8','#fb923c','#a78bfa','#34d399','#f472b6','#facc15'];
+
+// PIE CHART
+const pieCtx = document.getElementById('pieChart').getContext('2d');
+if (pieValues.length > 0) {
+  new Chart(pieCtx, {
+    type: 'doughnut',
+    data: {
+      labels: pieLabels,
+      datasets: [{
+        data: pieValues,
+        backgroundColor: COLORS,
+        borderWidth: 0,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: '#9ca3af',
+            font: { size: 11, family: 'DM Sans' },
+            padding: 12,
+            boxWidth: 10,
+            usePointStyle: true,
+          }
+        }
+      }
+    }
+  });
+} else {
+  pieCtx.canvas.parentNode.innerHTML = '<div class="empty-state" style="padding:40px 0;"><p style="font-size:0.9rem;">No expense data</p></div>';
+}
+
+// BAR CHART
+const barCtx = document.getElementById('barChart').getContext('2d');
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: barLabels,
+    datasets: [
+      {
+        label: 'Income',
+        data: barIncome,
+        backgroundColor: 'rgba(74,222,128,0.7)',
+        borderRadius: 6,
+        borderSkipped: false,
+      },
+      {
+        label: 'Expense',
+        data: barExpense,
+        backgroundColor: 'rgba(248,113,113,0.7)',
+        borderRadius: 6,
+        borderSkipped: false,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#9ca3af',
+          font: { size: 11, family: 'DM Sans' },
+          usePointStyle: true,
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: '#6b7280', font: { size: 11 } },
+        grid: { color: 'rgba(255,255,255,0.04)' }
+      },
+      y: {
+        ticks: { color: '#6b7280', font: { size: 11 } },
+        grid: { color: 'rgba(255,255,255,0.04)' }
+      }
+    }
+  }
+});
+</script>
+{% endblock %}

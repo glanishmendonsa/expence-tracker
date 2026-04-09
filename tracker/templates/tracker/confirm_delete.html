@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Delete Transaction — Flo{% endblock %}
+
+{% block content %}
+<div style="max-width:480px;margin:60px auto;text-align:center;">
+  <div class="card">
+    <div style="width:56px;height:56px;background:rgba(248,113,113,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+      <svg width="26" height="26" fill="none" viewBox="0 0 24 24" stroke="#f87171"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+    </div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:8px;">Delete Transaction?</div>
+    <div style="color:var(--muted);font-size:0.9rem;margin-bottom:24px;">
+      Are you sure you want to delete <strong style="color:var(--text);">{{ transaction.title }}</strong>?<br>
+      <span style="font-size:0.82rem;">Amount: {{ transaction.currency_symbol }}{{ transaction.amount }} • {{ transaction.date }}</span>
+    </div>
+    <div style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:24px;text-align:left;">
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:4px;">Transaction Details</div>
+      <div style="font-weight:500;">{{ transaction.title }}</div>
+      <div style="font-size:0.83rem;color:var(--muted);">{{ transaction.category }} · {{ transaction.type|title }} · {{ transaction.date }}</div>
+    </div>
+    <form method="post" style="display:flex;gap:10px;justify-content:center;">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+      <a href="{% url 'transaction_list' %}" class="btn btn-ghost">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

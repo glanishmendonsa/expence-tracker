@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block nav_transactions %}active{% endblock %}
+{% block title %}Transactions — Flo{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+  <div>
+    <div class="page-title">Transactions</div>
+    <div class="page-subtitle">{{ transactions|length }} record{{ transactions|length|pluralize }} found</div>
+  </div>
+  <a href="{% url 'add_transaction' %}" class="btn btn-primary">
+    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+    Add Transaction
+  </a>
+</div>
+
+<!-- FILTERS -->
+<form method="get">
+  <div class="filters">
+    <select name="type" class="filter-select" onchange="this.form.submit()">
+      <option value="">All Types</option>
+      <option value="income" {% if type_filter == 'income' %}selected{% endif %}>Income</option>
+      <option value="expense" {% if type_filter == 'expense' %}selected{% endif %}>Expense</option>
+    </select>
+    <select name="category" class="filter-select" onchange="this.form.submit()">
+      <option value="">All Categories</option>
+      {% for val, label in categories %}
+        <option value="{{ val }}" {% if category_filter == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="currency" class="filter-select" onchange="this.form.submit()">
+      <option value="">All Currencies</option>
+      {% for val, label in currencies %}
+        <option value="{{ val }}" {% if currency_filter == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="month" class="filter-select" onchange="this.form.submit()">
+      <option value="">All Months</option>
+      {% for num, name in months %}
+        <option value="{{ num }}" {% if month_filter == num|stringformat:"s" %}selected{% endif %}>{{ name }}</option>
+      {% endfor %}
+    </select>
+    <select name="year" class="filter-select" onchange="this.form.submit()">
+      <option value="">All Years</option>
+      {% for y in years %}
+        <option value="{{ y }}" {% if year_filter == y|stringformat:"s" %}selected{% endif %}>{{ y }}</option>
+      {% endfor %}
+    </select>
+    {% if type_filter or category_filter or currency_filter or month_filter or year_filter %}
+      <a href="{% url 'transaction_list' %}" class="btn btn-ghost btn-sm">✕ Clear</a>
+    {% endif %}
+  </div>
+</form>
+
+<!-- SUMMARY ROW -->
+<div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
+  <div style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.2);border-radius:10px;padding:12px 20px;">
+    <span style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">Income</span>
+    <div style="color:#4ade80;font-weight:700;font-size:1.1rem;margin-top:2px;">₹{{ total_income|floatformat:2 }}</div>
+  </div>
+  <div style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:12px 20px;">
+    <span style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;">Expenses</span>
+    <div style="color:#f87171;font-weight:700;font-size:1.1rem;margin-top:2px;">₹{{ total_expense|floatformat:2 }}</div>
+  </div>
+</div>
+
+<!-- TABLE -->
+<div class="card" style="padding:0;overflow:hidden;">
+  {% if transactions %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Date</th>
+          <th>Currency</th>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in transactions %}
+        <tr>
+          <td>
+            <div style="font-weight:500;">{{ t.title }}</div>
+            {% if t.note %}<div style="font-size:0.78rem;color:var(--muted);margin-top:2px;">{{ t.note|truncatechars:40 }}</div>{% endif %}
+          </td>
+          <td style="color:var(--muted);font-size:0.85rem;">{{ t.category }}</td>
+          <td style="color:var(--muted);font-size:0.85rem;white-space:nowrap;">{{ t.date|date:"d M Y" }}</td>
+          <td style="font-size:0.82rem;">
+            <span style="background:var(--surface2);padding:3px 8px;border-radius:6px;font-weight:600;">{{ t.currency }}</span>
+          </td>
+          <td><span class="badge badge-{{ t.type }}">{{ t.type|title }}</span></td>
+          <td class="amount-{{ t.type }}" style="white-space:nowrap;">{{ t.currency_symbol }}{{ t.amount }}</td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <a href="{% url 'edit_transaction' t.pk %}" class="btn btn-ghost btn-sm">Edit</a>
+              <a href="{% url 'delete_transaction' t.pk %}" class="btn btn-danger btn-sm">Del</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    <p>No transactions found</p>
+    <span>Try adjusting your filters or add a new transaction</span>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
