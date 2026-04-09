@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "expense_tracker/core/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "runtime": "python3.12"
+      }
+    },
+    {
+      "src": "build.sh",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "staticfiles"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "expense_tracker/core/wsgi.py"
+    }
+  ]
+}
